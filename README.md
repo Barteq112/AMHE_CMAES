@@ -29,4 +29,4 @@ Logi COCO (opcjonalnie ECDF): `exdata/results_coco/`.
 python visualize_results.py
 ```
 
-**Opis wykresów (scenariusz → plik PNG):** [results/report/README.md](results/report/README.md)
+**Opis wykresów ze zdjęciami:** [results/report/README.md](results/report/README.md) (obrazki PNG w tym samym folderze)

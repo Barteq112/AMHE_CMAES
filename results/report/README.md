@@ -1,12 +1,5 @@
-# Wyniki i wykresy — AMHE (CMA-ES + bbob-constrained)
+# Wyniki i wykresy
 
-Ten folder powstaje po uruchomieniu:
-
-```bash
-python visualize_results.py
-python visualize_results.py --scenario 1    # tylko wybrane scenariusze
-python visualize_results.py --out results/report
-```
 
 Porównywane są **3 metody** obsługi ograniczeń w CMA-ES:
 
@@ -16,89 +9,84 @@ Porównywane są **3 metody** obsługi ograniczeń w CMA-ES:
 | `reject` | odrzucenie | Niedopuszczalny osobnik jest zastępowany losowym punktem z dopuszczalnego obszaru |
 | `penalty` | kara | Do wartości funkcji celu dodawana jest kara za naruszenie ograniczeń |
 
-Benchmark: **bbob-constrained** (biblioteka `cocoex`).
+Benchmark: **bbob-constrained** (`cocoex`).
 
 ---
 
 ## Pliki wspólne
 
-- **`podsumowanie.md`** — tabela tekstowa: liczba przebiegów, liczba „wygranych”, średnia ranga, `target_hit` dla każdej metody i scenariusza.
+- **`podsumowanie.md`** — liczba przebiegów, wygrane, średnia ranga, `target_hit` (tekst).
 
 ---
 
 ## Scenariusz 1 — porównanie skuteczności (D = 5)
 
-**Cel:** pełny zestaw funkcji bbob-constrained w 5 wymiarach (funkcje 1–54, instancje 1–3).
+**Cel:** pełny zestaw bbob-constrained w 5 wymiarach (funkcje 1–54, instancje 1–3).  
+**Dane:** `results/scenario1/`
 
-**Uruchomienie:** `python -m scenarios.scenario1`  
-**Dane źródłowe:** `results/scenario1/` (`porownanie.csv`, pliki `s1_*.csv` / `s1_*.json`)
+### `scenario1_ranking.png`
 
-### Wykresy
+Lewy panel: ile problemów metoda **wygrała** (najniższe `best_f` na tym zadaniu).  
+Prawy panel: **średnia ranga** (1 = najlepiej, 3 = najgorzej) na całym scenariuszu.
 
-- **`scenario1_ranking.png`**
-  - Lewy panel: **ile problemów** (funkcja + instancja) dana metoda wygrała — ma najniższe `best_f` wśród trzech metod na tym samym zadaniu.
-  - Prawy panel: **średnia ranga** (1 = najlepsza, 3 = najgorsza) na wszystkich problemach scenariusza 1.
-  - Służy do ogólnego porównania: która metoda najczęściej daje najlepszy wynik na pełnym benchmarku w 5D.
+![Scenariusz 1 — ranking metod](scenario1_ranking.png)
 
-- **`scenario1_convergence.png`**
-  - Przykładowa **krzywa zbieżności** dla jednego problemu (domyślnie coś z rodziny f001): oś X = liczba ewaluacji, oś Y = najlepsze dotąd `best_f`.
-  - Trzy linie = rzut, odrzucenie, kara — widać, jak szybko spada wartość celu w trakcie jednego runu.
+### `scenario1_convergence.png`
+
+Przykładowa **zbieżność** na jednym problemie: oś X = ewaluacje, oś Y = najlepsze `best_f`; trzy krzywe = rzut, odrzucenie, kara.
+
+![Scenariusz 1 — przykładowa zbieżność](scenario1_convergence.png)
 
 ---
 
 ## Scenariusz 2 — wpływ wymiarowości (D = 2, 10, 20)
 
-**Cel:** sprawdzić, jak metody radzą sobie przy rosnącej liczbie wymiarów (w tym czy **odrzucenie** słabnie przy D = 10 i 20). Wybrane funkcje: f1, f2, f3, f7, f19, f43; mniejszy budżet ewaluacji niż w scenariuszu 1.
+**Cel:** wpływ wymiaru (m.in. słabość odrzucania przy 10 i 20). Funkcje: f1, f2, f3, f7, f19, f43.  
+**Dane:** `results/scenario2/`
 
-**Uruchomienie:** `python -m scenarios.scenario2`  
-**Dane źródłowe:** `results/scenario2/`
+### `scenario2_ranking.png`
 
-### Wykresy
+Ranking zebrany **dla wszystkich wymiarów** naraz (2, 10, 20).
 
-- **`scenario2_ranking.png`**
-  - Jak `scenario1_ranking.png`, ale **zebrane dla wszystkich wymiarów** (2, 10, 20) naraz — ogólny ranking metod w tym eksperymencie.
+![Scenariusz 2 — ranking metod](scenario2_ranking.png)
 
-- **`scenario2_by_dimension.png`**
-  - **Średnia ranga** metody osobno dla **D = 2**, **D = 10** i **D = 20**.
-  - Służy do wniosku z PDF: czy np. odrzucenie wyraźnie psuje się przy 10 i 20 wymiarach (wyższa ranga = gorzej).
+### `scenario2_by_dimension.png`
 
-- **`scenario2_convergence.png`**
-  - Przykładowa zbieżność dla problemu w **2D** (np. f001) — porównanie trzech metod na jednym zadaniu niskiego wymiaru.
+**Średnia ranga** osobno dla D = 2, 10 i 20 — widać, czy metoda się pogarsza w wyższych wymiarach.
+
+![Scenariusz 2 — ranga vs wymiar](scenario2_by_dimension.png)
+
+### `scenario2_convergence.png`
+
+Przykładowa zbieżność w **2D** (np. f001).
+
+![Scenariusz 2 — przykładowa zbieżność](scenario2_convergence.png)
 
 ---
 
 ## Scenariusz 3 — stabilność na granicy ograniczeń
 
-**Cel:** funkcje z **jednym** ograniczeniem (f1, f7, f13, f19, f25, f31, f37, f43, f49) — optimum leży na aktywnym ograniczeniu; test, która metoda dobrze szuka rozwiązania **przy brzegu** obszaru dopuszczalnego.
+**Cel:** funkcje z **1 ograniczeniem** (f1, f7, f13, …, f49) — optimum na brzegu.  
+**Dane:** `results/scenario3/`
 
-**Uruchomienie:** `python -m scenarios.scenario3`  
-**Dane źródłowe:** `results/scenario3/`
+### `scenario3_ranking.png`
 
-### Wykresy
+Wygrane i średnia ranga tylko na zadaniach „na granicy” (D = 5).
 
-- **`scenario3_ranking.png`**
-  - Wygrane i średnia ranga — tylko na zadaniach „na granicy” (D = 5, warianty z 1 ograniczeniem).
+![Scenariusz 3 — ranking metod](scenario3_ranking.png)
 
-- **`scenario3_convergence.png`**
-  - Przykładowa krzywa zbieżności dla jednego z tych problemów (np. f001 z 1 ograniczeniem).
+### `scenario3_convergence.png`
 
----
+Przykładowa zbieżność na jednym z tych problemów.
 
-## Jak czytać ranking (ważne)
-
-- Porównanie jest po wartości **`best_f`** zapisanej przez CMA-ES (niżej = lepiej w rankingu na danym problemie).
-- Wszystkie trzy metody starają się trzymać ograniczeń; wynik **nie** jest tym samym co oficjalny wykres **ECDF** z COCO (ten powstaje z logów w `exdata/results_coco/` i `cocopp`).
-- Kolumna **`target_hit`** w `podsumowanie.md` pochodzi z COCO — informuje, czy algorytm osiągnął zadany próg celu przy dopuszczalnym postępie (wartość > 0 bywa cenniejsza niż sama „wygrana” po `best_f`).
+![Scenariusz 3 — przykładowa zbieżność](scenario3_convergence.png)
 
 ---
 
-## Szybkie odświeżenie wykresów
+## Jak czytać wyniki
 
-Po dokończeniu lub zmianie wyników w `results/scenario*/`:
+- Ranking po **`best_f`** (niżej = lepiej w porównaniu na tym samym problemie).
+- To **nie** jest wykres ECDF z COCO (ten z logów w `exdata/results_coco/` + `cocopp`).
+- **`target_hit`** w `podsumowanie.md` — czy COCO uznało osiągnięcie celu przy dopuszczalnym postępie.
 
-```bash
-python visualize_results.py              # wszystkie scenariusze z danymi
-python visualize_results.py --scenario 3 # tylko scenariusz 3
-```
 
-Nowe pliki PNG i `podsumowanie.md` nadpiszą poprzednie w tym folderze.
