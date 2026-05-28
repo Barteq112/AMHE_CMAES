@@ -83,10 +83,6 @@ Przykładowa zbieżność na jednym z tych problemów.
 
 ---
 
-## Jak czytać wyniki
 
-- Ranking po **`best_f`** (niżej = lepiej w porównaniu na tym samym problemie).
-- To **nie** jest wykres ECDF z COCO (ten z logów w `exdata/results_coco/` + `cocopp`).
-- **`target_hit`** w `podsumowanie.md` — czy COCO uznało osiągnięcie celu przy dopuszczalnym postępie.
 
 
