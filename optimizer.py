@@ -16,7 +16,7 @@ def eval_fitness(x, problem, method, penalty_weight=1e4):
 def run_cmaes(problem, method="project", max_evals=2000, seed=0, sigma_scale=0.2):
     """
     problem — obiekt cocoex z suite bbob-constrained
-    method: none | project | reject | penalty
+    method: project | reject | penalty
     """
     rng = np.random.default_rng(seed)
     x0 = np.array(problem.initial_solution, dtype=float)

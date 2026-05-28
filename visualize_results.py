@@ -1,8 +1,8 @@
 """
 Podsumowanie i wykresy z folderów results/scenario*.
 
-  python visualize_results.py
-  python visualize_results.py --out results/report
+  python visualize_results.py --scenario 1
+  python visualize_results.py --scenario 1 --out results/report_sc1
 """
 
 import argparse
@@ -15,14 +15,17 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 
-METHODS = ["none", "project", "reject", "penalty"]
+METHODS = ["project", "reject", "penalty"]
 METHOD_LABELS = {
-    "none": "bez obsługi",
     "project": "rzut",
     "reject": "odrzucenie",
     "penalty": "kara",
 }
-COLORS = {"none": "#888888", "project": "#2ecc71", "reject": "#e74c3c", "penalty": "#3498db"}
+COLORS = {"project": "#2ecc71", "reject": "#e74c3c", "penalty": "#3498db"}
+
+
+def keep_methods(rows):
+    return [r for r in rows if r.get("method") in METHODS]
 
 
 def load_porownanie(path: Path):
@@ -42,7 +45,7 @@ def load_from_json_runs(scenario_dir: Path):
             continue
         method = data.get("method")
         if not method:
-            m = re.search(r"_(none|project|reject|penalty)_", p.name)
+            m = re.search(r"_(project|reject|penalty)_", p.name)
             method = m.group(1) if m else None
         if method not in METHODS:
             continue
@@ -69,7 +72,7 @@ def load_from_json_runs(scenario_dir: Path):
     rows = [v[1] for v in best.values()]
     for r in rows:
         r["scenario"] = scenario_dir.name.replace("scenario", "")
-    return rows
+    return keep_methods(rows)
 
 
 def load_scenario(scenario_num: str, base: Path):
@@ -82,6 +85,7 @@ def load_scenario(scenario_num: str, base: Path):
     else:
         for r in rows:
             r["scenario"] = scenario_num
+        rows = keep_methods(rows)
     return rows
 
 
@@ -127,7 +131,7 @@ def plot_method_wins(rows, title, out_path):
     axes[1].set_xticks(x)
     axes[1].set_xticklabels(labels, rotation=15, ha="right")
     axes[1].set_ylabel("średnia ranga (mniej = lepiej)")
-    axes[1].set_ylim(1, 4.2)
+    axes[1].set_ylim(1, len(METHODS) + 0.2)
     axes[1].set_title("Średnia ranga")
 
     fig.suptitle(title)
@@ -159,7 +163,7 @@ def plot_scenario2_dims(rows, out_path):
     ax.set_ylabel("średnia ranga (mniej = lepiej)")
     ax.set_title("Scenariusz 2 — wpływ wymiarowości")
     ax.legend()
-    ax.set_ylim(1, 4.2)
+    ax.set_ylim(1, len(METHODS) + 0.2)
     fig.tight_layout()
     fig.savefig(out_path, dpi=120)
     plt.close(fig)
@@ -201,9 +205,9 @@ def plot_convergence_sample(scenario_dir: Path, out_path, problem_hint="f001"):
     plt.close(fig)
 
 
-def write_summary(all_rows, out_dir: Path):
+def write_summary(all_rows, out_dir: Path, scenarios=None):
     lines = ["# Podsumowanie AMHE CMA-ES\n"]
-    for sc in ["1", "2", "3"]:
+    for sc in scenarios or ["1", "2", "3"]:
         rows = [r for r in all_rows if str(r.get("scenario")) == sc]
         if not rows:
             lines.append(f"\n## Scenariusz {sc}\n\nBrak danych.\n")
@@ -229,6 +233,8 @@ def write_summary(all_rows, out_dir: Path):
     }
     lines.append("\n## Pliki wykresów\n")
     for sc, desc in names.items():
+        if scenarios and sc not in scenarios:
+            continue
         lines.append(f"- scenariusz {sc} ({desc}): `scenario{sc}_*.png`\n")
 
     (out_dir / "podsumowanie.md").write_text("".join(lines), encoding="utf-8")
@@ -236,6 +242,12 @@ def write_summary(all_rows, out_dir: Path):
 
 def main():
     parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--scenario",
+        nargs="+",
+        choices=["1", "2", "3"],
+        help="tylko wybrane scenariusze (domyślnie: wszystkie, dla których są dane)",
+    )
     parser.add_argument("--results", default="results", help="folder z scenario1/2/3")
     parser.add_argument("--out", default="results/report", help="gdzie zapisać wykresy")
     args = parser.parse_args()
@@ -244,16 +256,22 @@ def main():
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
 
+    wanted = args.scenario or ["1", "2", "3"]
     all_rows = []
-    for sc in ["1", "2", "3"]:
+    for sc in wanted:
         rows = load_scenario(sc, base)
         all_rows.extend(rows)
 
     if not all_rows:
-        print("Brak wyników w results/scenario* — najpierw uruchom scenariusze.")
+        print(f"Brak wyników w results/scenario* dla: {wanted}")
         return
 
-    all_rows = add_ranks(all_rows)
+    # rangi liczone osobno w obrębie każdego scenariusza
+    ranked = []
+    for sc in wanted:
+        part = [r for r in all_rows if str(r.get("scenario")) == sc]
+        ranked.extend(add_ranks(part))
+    all_rows = ranked
 
     s1 = [r for r in all_rows if str(r.get("scenario")) == "1"]
     s2 = [r for r in all_rows if str(r.get("scenario")) == "2"]
@@ -270,7 +288,7 @@ def main():
         plot_method_wins(s3, "Scenariusz 3 — optimum na granicy", out / "scenario3_ranking.png")
         plot_convergence_sample(base / "scenario3", out / "scenario3_convergence.png", "f001")
 
-    write_summary(all_rows, out)
+    write_summary(all_rows, out, scenarios=wanted)
 
     print(f"Zapisano wykresy i podsumowanie w: {out.resolve()}")
     for p in sorted(out.glob("*")):

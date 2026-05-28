@@ -6,7 +6,7 @@ from coco_benchmark import make_observer, make_suite, problem_label
 from optimizer import run_cmaes
 from save_results import save_comparison_table, save_run
 
-METHODS = ["none", "project", "reject", "penalty"]
+METHODS = ["project", "reject", "penalty"]
 
 
 def execute(key, name, suite_options, budget_mult, coco_subdir, seed=42, dimensions=None):
@@ -29,7 +29,7 @@ def execute(key, name, suite_options, budget_mult, coco_subdir, seed=42, dimensi
             opts = suite_options
 
         suite = make_suite(opts)
-        # jeden observer na metodę (nie tworzyć na każdy problem — inaczej COCO robi none-0001, none-0002...)
+        # jeden observer na metodę (nie na każdy problem — inaczej COCO mnoży foldery -0001, -0002...)
         observers = {
             m: make_observer(os.path.join(coco_base, m)) for m in METHODS
         }

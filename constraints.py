@@ -65,8 +65,6 @@ def random_feasible(problem, rng, tries=3000):
 
 
 def fix_candidate(x, mean, problem, method, rng):
-    if method == "none":
-        return np.asarray(x, dtype=float)
     if method == "project":
         return project_toward_mean(x, mean, problem)
     if method == "reject":
