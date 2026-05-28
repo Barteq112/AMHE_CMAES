@@ -1,0 +1,9 @@
+.venv/
+__pycache__/
+*.pyc
+.idea/
+
+# wyniki eksperymentów (odtwarzalne)
+exdata/results_coco/
+results/scenario*/
+results/report/
