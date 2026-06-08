@@ -1,5 +1,7 @@
 """CMA-ES (biblioteka cma) na problemach bbob-constrained."""
 
+import time
+
 import numpy as np
 import cma
 
@@ -33,6 +35,8 @@ def run_cmaes(problem, method="project", max_evals=2000, seed=0, sigma_scale=0.2
 
     history = []
     evals = 0
+    repair_time_s = 0.0
+    t_start = time.perf_counter()
 
     while not es.stop() and evals < max_evals:
         solutions = es.ask()
@@ -41,7 +45,9 @@ def run_cmaes(problem, method="project", max_evals=2000, seed=0, sigma_scale=0.2
 
         for sol in solutions:
             x = np.array(sol, dtype=float)
+            t_repair = time.perf_counter()
             x = fix_candidate(x, problem, method, es)
+            repair_time_s += time.perf_counter() - t_repair
             fixed.append(x.tolist())
             fitnesses.append(eval_fitness(x, problem, method))
             evals += 1
@@ -52,7 +58,11 @@ def run_cmaes(problem, method="project", max_evals=2000, seed=0, sigma_scale=0.2
 
     best_x = np.array(es.result.xfavorite)
     if method in ("project", "reject"):
+        t_repair = time.perf_counter()
         best_x = fix_candidate(best_x, problem, method, es)
+        repair_time_s += time.perf_counter() - t_repair
+
+    wall_time_s = time.perf_counter() - t_start
 
     return {
         "method": method,
@@ -64,4 +74,6 @@ def run_cmaes(problem, method="project", max_evals=2000, seed=0, sigma_scale=0.2
         "problem_name": problem.name,
         "dimension": problem.dimension,
         "target_hit": bool(problem.final_target_hit),
+        "wall_time_s": wall_time_s,
+        "repair_time_s": repair_time_s,
     }
