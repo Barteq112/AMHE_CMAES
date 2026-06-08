@@ -3,3 +3,4 @@ cma>=3.2.0
 scipy>=1.7
 coco-experiment>=2.6
 matplotlib>=3.5
+cocopp

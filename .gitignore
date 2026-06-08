@@ -6,3 +6,6 @@ __pycache__/
 # wyniki eksperymentów (odtwarzalne)
 exdata/results_coco/
 results/scenario*/
+ppdata_scen1/
+ppdata_scen2/
+ppdata_scen3/

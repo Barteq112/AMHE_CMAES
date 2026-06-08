@@ -33,8 +33,8 @@ def clip_to_box(x, lb, ub):
     return np.minimum(np.maximum(x, lb), ub)
 
 
-def project_toward_mean(x, mean, problem, steps=80):
-    """Rzut w stronę średniej populacji — pierwszy dopuszczalny punkt na odcinku."""
+def project_toward_mean(x, mean, problem, max_iters=10):
+    """Rzut w stronę średniej populacji z użyciem wyszukiwania binarnego."""
     x = np.asarray(x, dtype=float)
     mean = np.asarray(mean, dtype=float)
     if is_feasible(problem, x):
@@ -45,32 +45,43 @@ def project_toward_mean(x, mean, problem, steps=80):
         lb, ub = _lb_ub(problem)
         return clip_to_box(x, lb, ub)
 
-    t_ok = 1.0
-    for i in range(steps + 1):
-        t = i / steps
-        p = x + t * d
+    if not is_feasible(problem, mean):
+        lb, ub = _lb_ub(problem)
+        return clip_to_box(mean, lb, ub)
+
+    t_inf = 0.0
+    t_feas = 1.0
+
+    for _ in range(max_iters):
+        t_mid = (t_inf + t_feas) / 2.0
+        p = x + t_mid * d
+
         if is_feasible(problem, p):
-            t_ok = t
-            break
-    return x + t_ok * d
+            t_feas = t_mid
+        else:
+            t_inf = t_mid
+
+    return x + t_feas * d
 
 
-def random_feasible(problem, rng, tries=3000):
-    lb, ub = _lb_ub(problem)
-    for _ in range(tries):
-        x = rng.uniform(lb, ub)
-        if is_feasible(problem, x):
-            return x
-    return clip_to_box(rng.uniform(lb, ub), lb, ub)
-
-
-def fix_candidate(x, mean, problem, method, rng):
+def fix_candidate(x, problem, method, es, tries=100):
     if method == "project":
-        return project_toward_mean(x, mean, problem)
+        return project_toward_mean(x, np.array(es.mean), problem)
+
     if method == "reject":
         if is_feasible(problem, x):
             return np.asarray(x, dtype=float)
-        return random_feasible(problem, rng)
+
+        for _ in range(tries):
+            new_x = np.asarray(es.ask(1)[0], dtype=float)
+            if is_feasible(problem, new_x):
+                return new_x
+
+        # fallback
+        lb, ub = _lb_ub(problem)
+        return clip_to_box(np.asarray(x, dtype=float), lb, ub)
+
     if method == "penalty":
         return np.asarray(x, dtype=float)
+
     raise ValueError(f"nieznana metoda: {method}")

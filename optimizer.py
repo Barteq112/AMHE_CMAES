@@ -18,7 +18,6 @@ def run_cmaes(problem, method="project", max_evals=2000, seed=0, sigma_scale=0.2
     problem — obiekt cocoex z suite bbob-constrained
     method: project | reject | penalty
     """
-    rng = np.random.default_rng(seed)
     x0 = np.array(problem.initial_solution, dtype=float)
     lb = np.array(problem.lower_bounds, dtype=float)
     ub = np.array(problem.upper_bounds, dtype=float)
@@ -37,13 +36,12 @@ def run_cmaes(problem, method="project", max_evals=2000, seed=0, sigma_scale=0.2
 
     while not es.stop() and evals < max_evals:
         solutions = es.ask()
-        mean = np.array(es.mean)
         fitnesses = []
         fixed = []
 
         for sol in solutions:
             x = np.array(sol, dtype=float)
-            x = fix_candidate(x, mean, problem, method, rng)
+            x = fix_candidate(x, problem, method, es)
             fixed.append(x.tolist())
             fitnesses.append(eval_fitness(x, problem, method))
             evals += 1
@@ -54,7 +52,7 @@ def run_cmaes(problem, method="project", max_evals=2000, seed=0, sigma_scale=0.2
 
     best_x = np.array(es.result.xfavorite)
     if method in ("project", "reject"):
-        best_x = fix_candidate(best_x, np.array(es.mean), problem, method, rng)
+        best_x = fix_candidate(best_x, problem, method, es)
 
     return {
         "method": method,
