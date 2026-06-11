@@ -27,16 +27,6 @@ Logi COCO: `exdata/results_coco/`.
 Wyniki: `results/report/`.
 
 
-Alternatywą jest uruchomienie wszystkiego ręcznie, można użyć bezpośrednio `docker run`:
-
-```bash
-docker build -t amhe-cmaes .
-docker run --rm -v "$PWD/results:/app/results" -v "$PWD/exdata:/app/exdata" amhe-cmaes
-```
-
-Domyślnie obraz uruchamia `python main.py --scenario 1 2 3`.
-
-
 ## Uruchomienie eksperymentów bez dockera
 
 ```bash
