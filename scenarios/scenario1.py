@@ -19,8 +19,13 @@ DIMENSIONS = None
 
 def run(seed=42):
     return execute(
-        KEY, NAME, SUITE_OPTIONS, BUDGET_MULT, COCO_SUBDIR,
-        seed=seed, dimensions=DIMENSIONS,
+        KEY,
+        NAME,
+        SUITE_OPTIONS,
+        BUDGET_MULT,
+        COCO_SUBDIR,
+        seed=seed,
+        dimensions=DIMENSIONS,
     )
 
 

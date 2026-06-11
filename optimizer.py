@@ -1,5 +1,3 @@
-"""CMA-ES (biblioteka cma) na problemach bbob-constrained."""
-
 import time
 
 import numpy as np

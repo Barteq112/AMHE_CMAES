@@ -4,8 +4,7 @@ AMHE — uruchomienie wybranych scenariuszy.
   python -m scenarios.scenario2      # tylko scenariusz 2
   python scenarios/scenario3.py     # tylko scenariusz 3
 
-  python main.py --scenario 2
-  python main.py --scenario 1 3
+  python main.py --scenario 1 2 3   # wszystkie scenariusze
 """
 
 import argparse

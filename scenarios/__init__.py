@@ -1,5 +1,3 @@
-"""Pakiet scenariuszy eksperymentów AMHE."""
-
 from scenarios._common import METHODS
 from scenarios import scenario1, scenario2, scenario3
 

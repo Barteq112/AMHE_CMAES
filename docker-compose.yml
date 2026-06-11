@@ -1,0 +1,8 @@
+services:
+  amhe:
+    build: .
+    image: amhe-cmaes:latest
+    working_dir: /app
+    volumes:
+      - .:/app
+    command: ["python", "main.py", "--scenario", "1", "2", "3"]

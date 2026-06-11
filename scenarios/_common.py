@@ -1,5 +1,3 @@
-"""Wspólna pętla CMA-ES × bbob-constrained (używana przez pliki scenariuszy)."""
-
 import os
 
 from coco_benchmark import make_observer, make_suite, problem_label
@@ -10,9 +8,9 @@ METHODS = ["project", "reject", "penalty"]
 
 
 def execute(key, name, suite_options, budget_mult, coco_subdir, seed=42, dimensions=None):
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print(f"SCENARIUSZ {key}: {name}")
-    print(f"{'='*60}\n")
+    print(f"{'=' * 60}\n")
 
     coco_base = os.path.join("results_coco", coco_subdir)
     results_dir = os.path.join("results", f"scenario{key}")
@@ -29,10 +27,8 @@ def execute(key, name, suite_options, budget_mult, coco_subdir, seed=42, dimensi
             opts = suite_options
 
         suite = make_suite(opts)
-        # jeden observer na metodę (nie na każdy problem — inaczej COCO mnoży foldery -0001, -0002...)
-        observers = {
-            m: make_observer(os.path.join(coco_base, m)) for m in METHODS
-        }
+
+        observers = {m: make_observer(os.path.join(coco_base, m)) for m in METHODS}
         n_probs = 0
 
         for problem in suite:
@@ -62,10 +58,7 @@ def execute(key, name, suite_options, budget_mult, coco_subdir, seed=42, dimensi
                         "budget": max_evals,
                         "target_hit": res["target_hit"],
                     })
-                    print(
-                        f"       best_f={res['best_f']:.6g}  "
-                        f"target_hit={res['target_hit']}"
-                    )
+                    print(f"       best_f={res['best_f']:.6g}  target_hit={res['target_hit']}")
                 except Exception as e:
                     print(f"       BŁĄD: {e}")
                 finally:

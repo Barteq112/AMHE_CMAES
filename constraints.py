@@ -1,5 +1,3 @@
-"""Obsługa ograniczeń dla problemów COCO (bbob-constrained)."""
-
 import numpy as np
 
 
@@ -9,7 +7,7 @@ def _lb_ub(problem):
 
 def is_feasible(problem, x):
     """
-    COCO: constraint(x) <= 0 oznacza spełnienie + trzeba być w regionie [lb, ub].
+    COCO: constraint(x) <= 0 oznacza spełnienie, trzeba też być w regionie [lb, ub].
     """
     x = np.asarray(x, dtype=float)
     lb, ub = _lb_ub(problem)

@@ -91,8 +91,14 @@ def save_detail(rows, path: Path):
 def save_summary(summary, path: Path):
     path.parent.mkdir(parents=True, exist_ok=True)
     fields = [
-        "method", "label", "problems", "total_wall_s", "mean_wall_s", "median_wall_s",
-        "total_repair_s", "repair_share_pct",
+        "method",
+        "label",
+        "problems",
+        "total_wall_s",
+        "mean_wall_s",
+        "median_wall_s",
+        "total_repair_s",
+        "repair_share_pct",
     ]
     with path.open("w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=fields)
@@ -102,10 +108,7 @@ def save_summary(summary, path: Path):
 
 def print_table(summary, seed):
     print(f"\nScenariusz 1 — szybkość metod (seed={seed}, D=5, budżet=100*D)\n")
-    header = (
-        f"{'Metoda':<12} {'Łącznie [s]':>12} {'Śr./problem [s]':>16} "
-        f"{'Mediana [s]':>12} {'Naprawa [%]':>12}"
-    )
+    header = f"{'Metoda':<12} {'Łącznie [s]':>12} {'Śr./problem [s]':>16} {'Mediana [s]':>12} {'Naprawa [%]':>12}"
     print(header)
     print("-" * len(header))
     for row in summary:

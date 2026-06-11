@@ -1,5 +1,3 @@
-"""Zapis wyników do plików (csv + prosty txt)."""
-
 import csv
 import json
 import os
@@ -42,7 +40,7 @@ def save_run(result, problem_name, dim, out_dir="results"):
 
 
 def save_comparison_table(rows, out_dir="results"):
-    """rows: lista dictów z kolumnami problem, method, best_f, ..."""
+    """rows: lista dict z kolumnami problem, method, best_f, ..."""
     out_dir = ensure_results_dir(out_dir)
     path = os.path.join(out_dir, "porownanie.csv")
     if not rows:

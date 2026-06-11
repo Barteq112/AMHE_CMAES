@@ -36,7 +36,6 @@ def load_porownanie(path: Path):
 
 
 def load_from_json_runs(scenario_dir: Path):
-    """Gdy brak porownanie.csv — zbierz z plików s*_*.json (najnowszy per problem+metoda)."""
     best = {}
     for p in scenario_dir.glob("s*.json"):
         try:
@@ -59,15 +58,18 @@ def load_from_json_runs(scenario_dir: Path):
         key = (problem_id, method)
         mtime = p.stat().st_mtime
         if key not in best or mtime > best[key][0]:
-            best[key] = (mtime, {
-                "problem_id": problem_id,
-                "problem": f"f{func_id:03d} i{inst:02d} d{dim:02d}",
-                "dim": dim,
-                "method": method,
-                "best_f": float(data["best_f"]),
-                "evals": data.get("evals", ""),
-                "target_hit": data.get("target_hit", False),
-            })
+            best[key] = (
+                mtime,
+                {
+                    "problem_id": problem_id,
+                    "problem": f"f{func_id:03d} i{inst:02d} d{dim:02d}",
+                    "dim": dim,
+                    "method": method,
+                    "best_f": float(data["best_f"]),
+                    "evals": data.get("evals", ""),
+                    "target_hit": data.get("target_hit", False),
+                },
+            )
 
     rows = [v[1] for v in best.values()]
     for r in rows:
@@ -90,7 +92,6 @@ def load_scenario(scenario_num: str, base: Path):
 
 
 def add_ranks(rows):
-    """Ranga 1 = najlepszy best_f w danej grupie (problem_id, dim)."""
     groups = defaultdict(list)
     for r in rows:
         key = (r.get("problem_id", r.get("problem", "")), str(r.get("dim", "")))
@@ -222,8 +223,7 @@ def write_summary(all_rows, out_dir: Path, scenarios=None):
             avg_r = np.mean([float(r["rank"]) for r in sub])
             hits = sum(1 for r in sub if str(r.get("target_hit", "")).lower() == "true")
             lines.append(
-                f"- **{METHOD_LABELS[m]}**: wygrane={wins}/{len(sub)}, "
-                f"śr. ranga={avg_r:.2f}, target_hit={hits}\n"
+                f"- **{METHOD_LABELS[m]}**: wygrane={wins}/{len(sub)}, śr. ranga={avg_r:.2f}, target_hit={hits}\n"
             )
 
     names = {

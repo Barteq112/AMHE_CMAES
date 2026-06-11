@@ -4,29 +4,55 @@ Projekt: porównanie metod obsługi ograniczeń w CMA-ES na benchmarku **bbob-co
 
 ## Metody
 
-- **rzut** (`project`) — rzut osobnika w stronę średniej populacji  
-- **odrzucenie** (`reject`) — losowanie nowego dopuszczalnego osobnika  
-- **kara** (`penalty`) — kara w funkcji celu za naruszenie ograniczeń  
+- **rzut** (`project`) — rzut osobnika w stronę średniej populacji
+- **odrzucenie** (`reject`) — losowanie nowego dopuszczalnego osobnika
+- **kara** (`penalty`) — kara w funkcji celu za naruszenie ograniczeń
 
-## Uruchomienie eksperymentów
+
+## Docker
+
+Po sklonowaniu repo i przy zainstalowanym Dockerze najprościej przejść kolejno przez:
+
+```bash
+docker compose up --build
+docker compose run --rm amhe python benchmark_speed.py
+docker compose run --rm amhe python visualize_results.py
+```
+
+Pierwsza komenda uruchamia eksperymenty z `main.py --scenario 1 2 3`. Dwie kolejne korzystają z tych samych danych zapisanych lokalnie w `results/` i `exdata/`.
+
+
+Wyniki liczbowe: `results/scenario1/`, `scenario2/`, `scenario3/`.
+Logi COCO: `exdata/results_coco/`.
+Wyniki: `results/report/`.
+
+
+Alternatywą jest uruchomienie wszystkiego ręcznie, można użyć bezpośrednio `docker run`:
+
+```bash
+docker build -t amhe-cmaes .
+docker run --rm -v "$PWD/results:/app/results" -v "$PWD/exdata:/app/exdata" amhe-cmaes
+```
+
+Domyślnie obraz uruchamia `python main.py --scenario 1 2 3`.
+
+
+## Uruchomienie eksperymentów bez dockera
 
 ```bash
 pip install -r requirements.txt
 
-python -m scenarios.scenario1   # pełny zestaw, D=5
-python -m scenarios.scenario2   # wymiarowość D=2,10,20
-python -m scenarios.scenario3   # optimum na granicy
-
-python main.py --scenario 1 2   # wybrane przez main.py
+python main.py --scenario 1 2 3
 ```
 
-Wyniki liczbowe: `results/scenario1/`, `scenario2/`, `scenario3/`.  
-Logi COCO (opcjonalnie ECDF): `exdata/results_coco/`.
+### Benchmark prędkości
 
-## Wykresy i opis
+```bash
+python benchmark_speed.py
+```
+
+### Wykresy i opis
 
 ```bash
 python visualize_results.py
 ```
-
-**Opis wykresów ze zdjęciami:** [results/report/README.md](results/report/README.md) (obrazki PNG w tym samym folderze)
