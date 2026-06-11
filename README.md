@@ -23,7 +23,9 @@ Pierwsza komenda uruchamia eksperymenty z `main.py --scenario 1 2 3`. Dwie kolej
 
 
 Wyniki liczbowe: `results/scenario1/`, `scenario2/`, `scenario3/`.
+
 Logi COCO: `exdata/results_coco/`.
+
 Wyniki: `results/report/`.
 
 
