@@ -37,7 +37,7 @@ pip install -r requirements.txt
 python main.py --scenario 1 2 3
 ```
 
-### Benchmark prędkości
+### Benchmark czasu
 
 ```bash
 python benchmark_speed.py
